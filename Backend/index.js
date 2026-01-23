@@ -4,12 +4,14 @@ const mongoose = require('mongoose')
 const {v2:cloudinary } = require("cloudinary") // image storage 
 const cors = require("cors")
 const bodyParser = require('body-parser')
-const {registrationMODLE} = require("./RegistrationModel.js")
+const registrationMODLE = require("./RegistrationModel.js")
+const multer = require("multer"); 
 
 const app = express();
 const PORT = 8080;
 
 app.use(express.json())
+app.use(cors());
 
 
 app.listen(PORT, () => {
@@ -26,21 +28,25 @@ const connectDB = async()=> {
   }
 }
 
-app.post("/register", async()=>{
 
-})
+const storage = multer.diskStorage({
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
+const upload = multer({ storage });
 
 const CloudImg = async(LocalFilePath)=>{
 
-    // Configuration
+    
     cloudinary.config({ 
         cloud_name: process.env.CLOUD_NAME, 
         api_key: process.env.CLOUDINARY_API_KEY , 
         api_secret:  process.env.CLOUDINARY_API_SECERET
     });
     
-    // Upload an image
+    
      const uploadResult = await cloudinary.uploader
        .upload(
            LocalFilePath, {
@@ -75,3 +81,35 @@ const CloudImg = async(LocalFilePath)=>{
 }
 
 // CloudImg() 
+
+
+app.post("/register", upload.single("image"), async (req, res) => {
+  try {
+    console.log("the api triggered !")
+    const result = await CloudImg(req.file.path);
+    console.log(result)
+    
+    const newUser = new registrationMODLE({
+      Name: req.body.Name,
+      RegNo: req.body.RegNo,
+      PhoneNo: req.body.PhoneNo,
+      Email: req.body.Email,
+      College: req.body.College,
+      Class: req.body.Class,
+      Size: req.body.Size,
+      ImgURL: result  
+    });
+
+    await newUser.save();
+
+    console.log("User data is saved to the DB")
+    res.status(201).json({
+      message: "Registration successful",
+      data: newUser,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Registration failed" });
+  }
+});

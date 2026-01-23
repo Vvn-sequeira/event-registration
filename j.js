@@ -273,14 +273,14 @@ document.addEventListener('DOMContentLoaded', () => {
          }, 3000);
      });
  */
-    const customForm = document.getElementById('customForm');
+    // const customForm = document.getElementById('customForm');
 
-    if (customForm) {
-        customForm.addEventListener('submit', () => {
-            const btn = customForm.querySelector('.submit-btn span');
-            btn.textContent = 'Submitting...';
-        });
-    }
+    // if (customForm) {
+    //     customForm.addEventListener('submit', () => {
+    //         const btn = customForm.querySelector('.submit-btn span');
+    //         btn.textContent = 'Submitting...';
+    //     });
+    // }
 
     // Cart functionality
     let cartCount = 0;
