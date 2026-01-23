@@ -110,6 +110,6 @@ app.post("/register", upload.single("image"), async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Registration failed" });
+    res.status(500).json({ error });
   }
 });
